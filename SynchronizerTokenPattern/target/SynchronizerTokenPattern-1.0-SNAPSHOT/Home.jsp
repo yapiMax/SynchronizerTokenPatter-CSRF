@@ -18,7 +18,7 @@
             $(document).ready(function () {
                 $.ajax({
                     type: "GET",
-                    url: "http://localhost:8080/SynchronizerTokenPattern/CSRFTokenController",
+                    url: "http://localhost:8082/SynchronizerTokenPattern/CSRFTokenController",
                     dataType: "json",
                     cache: false,
                     crossDomain: true,

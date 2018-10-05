@@ -3,14 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package yapilk;
+package com.yapilk.synchronizertokenpattern;
 
-import com.google.gson.JsonObject;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javafx.scene.control.Alert;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -20,11 +19,11 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author yapilk
  */
-public class CSRFTokenController extends HttpServlet {
+@WebServlet(name = "HomeController", urlPatterns = {"/HomeController"})
+public class HomeController extends HttpServlet {
 
-    public String csrf = null;
-    JsonObject jsonObj = new JsonObject();
-    
+    private String storeCsrfToken = null;
+    private String homeCsrfToken = null;
     
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,28 +36,34 @@ public class CSRFTokenController extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        response.setContentType("application/json;charset=UTF-8");
+        response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
+        
+        out.println(homeCsrfToken);
+        out.println(storeCsrfToken);
             
-            Cookie[] cookies = request.getCookies();
-            
-            if(cookies != null)
+        
+        if(homeCsrfToken != null)
+        {
+            if(storeCsrfToken.equals(homeCsrfToken))
             {
-                for(Cookie cookie : cookies)
-                {
-                    if(cookie.getName().equals("JSESSIONID"))
-                    {
-                        csrf = TokenStore.getToken(cookie.getValue());
-                    }
-                }
-                
-               jsonObj.addProperty("csrf", csrf);
-               out.print(jsonObj.toString());
+                out.println("Successful");
+                response.sendRedirect("Successful.jsp");
             }
+            else
+            {
+                out.println("Error");
+                response.sendRedirect("Error.jsp");
+            }
+        }
+        else
+        {
+            out.print("CSRF Token Empty");
+            response.sendRedirect("Login.jsp");
+        }
+            
             
         }
-        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -87,8 +92,23 @@ public class CSRFTokenController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-            processRequest(request, response);
         
+        homeCsrfToken = request.getParameter("csrfToken");
+        
+        Cookie[] cookies = request.getCookies();
+        
+        if(cookies != null)
+        {
+            for(Cookie cookie : cookies)
+            {
+                if(cookie.getName().equals("JSESSIONID"))
+                {
+                    storeCsrfToken = TokenStore.getToken(cookie.getValue());
+                }
+            }
+        }
+        
+        processRequest(request, response);
     }
 
     /**

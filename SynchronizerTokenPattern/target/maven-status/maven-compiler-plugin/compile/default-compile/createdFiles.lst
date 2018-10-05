@@ -1,0 +1,4 @@
+com\yapilk\synchronizertokenpattern\CSRFTokenController.class
+com\yapilk\synchronizertokenpattern\LoginController.class
+com\yapilk\synchronizertokenpattern\TokenStore.class
+com\yapilk\synchronizertokenpattern\HomeController.class
